@@ -1,0 +1,48 @@
+const int pirSensorPin = 2; // PIR sensor output pin connected to digital pin 2
+const int ledPin = LED_BUILTIN; // Built-in LED pin (usually pin 13)
+volatile bool motionDetected = false; // A flag to indicate motion detection
+
+void setup() {
+  // Initialize the serial communication
+  Serial.begin(9600);
+  
+  // Initialize the PIR sensor pin as input
+  pinMode(pirSensorPin, INPUT);
+  
+  // Initialize the built-in LED pin as output
+  pinMode(ledPin, OUTPUT);
+  
+  // Attach an interrupt to the PIR sensor pin
+  attachInterrupt(digitalPinToInterrupt(pirSensorPin), motionISR, CHANGE);
+  
+  // Print a message to the serial monitor
+  Serial.println("PIR sensor system initialized with interrupt.");
+}
+
+void loop() {
+  // Check if motion was detected
+  if (motionDetected) {
+    // Motion detected, turn on the LED
+    digitalWrite(ledPin, HIGH);
+    Serial.println("Motion detected: LED ON");
+    
+    // Wait for a while to keep the LED on
+    delay(1000);
+    
+    // Reset the motion detected flag
+    motionDetected = false;
+  } else {
+    // No motion detected, turn off the LED
+    digitalWrite(ledPin, LOW);
+    Serial.println("No motion: LED OFF");
+  }
+  
+  // Add a small delay to avoid flooding the serial monitor
+  delay(500);
+}
+
+// Interrupt service routine (ISR) to handle motion detection
+void motionISR() {
+  // Set the motion detected flag
+  motionDetected = true;
+}
